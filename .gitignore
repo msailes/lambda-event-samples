@@ -24,3 +24,6 @@ hs_err_pid*
 /.idea/
 /lambda-event-samples/HelloWorldFunction/HelloWorld.iml
 .aws-sam/
+target/
+/lambda-event-samples/samconfig.toml
+/lambda-event-samples/HelloWorldFunction/dependency-reduced-pom.xml

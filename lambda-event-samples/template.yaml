@@ -17,6 +17,13 @@ Resources:
       Handler: helloworld.AmazonConnectHandler::handleRequest
       Runtime: java8
       MemorySize: 512
+  SecretsManagerRotationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: HelloWorldFunction
+      Handler: helloworld.SecretsManagerRotationHandler::handleRequest
+      Runtime: java8
+      MemorySize: 512
 
 Outputs:
   HelloWorldFunction:
