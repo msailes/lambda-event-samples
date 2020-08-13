@@ -6,9 +6,9 @@ import com.amazonaws.services.lambda.runtime.events.SecretsManagerRotationEvent;
 
 public class SecretsManagerRotationHandler implements RequestHandler<SecretsManagerRotationEvent, String> {
 
-        public String handleRequest(SecretsManagerRotationEvent event, final Context context) {
-            context.getLogger().log(event.toString());
+    public String handleRequest(SecretsManagerRotationEvent event, final Context context) {
+        context.getLogger().log(event.toString());
 
-            return "OK";
-        }
+        return "OK";
     }
+}
