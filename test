@@ -1,0 +1,37 @@
+docker run -d -v $(pwd)/local-lambda-runtime-server:/opt/local-lambda-runtime-server -p 9000:8080 --entrypoint /opt/local-lambda-runtime-server/aws-lambda-local lambda-test /bootstrap-with-handler helloworld.APIGatewayV2Handler
+
+curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{}'
+
+
+
+FROM amd64/maven as build-image
+
+WORKDIR "/task"
+COPY src/ src/
+COPY pom.xml ./
+
+RUN mvn -q clean install
+RUN mvn dependency:copy-dependencies -DincludeScope=compile
+
+FROM 628053151772.dkr.ecr.sa-east-1.amazonaws.com/awslambda/{{cookiecutter.runtime}}-runtime:beta
+
+COPY --from=build-image /task/target/classes /var/task/
+COPY --from=build-image /task/target/dependency /var/task/lib
+
+# Command can be overwritten by providing a different command in the template directly.
+CMD ["helloworld.App::handleRequest"]
+
+aws ecr get-login-password \
+              --region sa-east-1 \
+          | docker login \
+              --username AWS \
+              --password-stdin 719169216310.dkr.ecr.sa-east-1.amazonaws.com
+
+docker tag lambda-test:latest 719169216310.dkr.ecr.sa-east-1.amazonaws.com/lambda-test:latest
+
+docker push 719169216310.dkr.ecr.sa-east-1.amazonaws.com/lambda-test:latest
+
+aws lambda --region sa-east-1 create-function \
+ --function-name lambda-test --package-type Image \
+ --code ImageUri=719169216310.dkr.ecr.sa-east-1.amazonaws.com/lambda-test:latest \
+ --role arn:aws:iam::719169216310:role/WildRydesLambda

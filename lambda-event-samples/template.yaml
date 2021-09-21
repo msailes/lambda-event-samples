@@ -8,6 +8,9 @@ Description: >
 Globals:
   Function:
     Timeout: 20
+    Runtime: java11
+    MemorySize: 512
+    Tracing: Active
 
 Resources:
   HelloWorldFunction:
@@ -15,15 +18,117 @@ Resources:
     Properties:
       CodeUri: HelloWorldFunction
       Handler: helloworld.AmazonConnectHandler::handleRequest
-      Runtime: java8
-      MemorySize: 512
   SecretsManagerRotationFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: HelloWorldFunction
       Handler: helloworld.SecretsManagerRotationHandler::handleRequest
-      Runtime: java8
-      MemorySize: 512
+  CloudFormationCustomResourceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: HelloWorldFunction
+      Handler: helloworld.CloudFormationCustomResourceEventHandler::handleRequest
+  DestinationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: HelloWorldFunction
+      Handler: helloworld.LambdaDestinationHandler::handleRequest
+  S3Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: HelloWorldFunction
+      Handler: helloworld.S3Handler::handleRequest
+  CustomAuth:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: HelloWorldFunction
+      Handler: helloworld.CustomAuth::handleRequest
+  CustomAuthV2:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: HelloWorldFunction
+      Handler: helloworld.CustomAuthV2::handleRequest
+  CustomAuthWithIAMPolicy:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: HelloWorldFunction
+      Handler: helloworld.CustomAuthWithIAMPolicyHandler::handleRequest
+
+#  ApiGatewayApi:
+#    Type: AWS::Serverless::Api
+#    Properties:
+#      StageName: prod
+  ApiGatewayProxy:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: HelloWorldFunction
+      Handler: helloworld.APIGatewayProxyHandler::handleRequest
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /version1
+            Method: get
+            PayloadFormatVersion: "2.0"
+#            RestApiId:
+#              Ref: ApiGatewayApi
+  ApiGatewayV2:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: HelloWorldFunction
+      Handler: helloworld.APIGatewayV2Handler::handleRequest
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /
+            Method: get
+      Policies:
+        - S3WritePolicy:
+            BucketName: mark-sailes-demo-bucket-ldn
+
+  EventBridgeHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: HelloWorldFunction
+      Handler: helloworld.EventBridgeHandler::handleRequest
+      Events:
+  ScheduleHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: HelloWorldFunction
+      Handler: helloworld.ScheduleHandler::handleRequest
+      Events:
+        CWSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: 'rate(1 minute)'
+            Name: TestSchedule
+            Description: test schedule
+            Enabled: False
+            Input: '{"Key": "Value"}'
+
+  S3BatchHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: HelloWorldFunction
+      Handler: helloworld.S3BatchHandler::handleRequest
+      Policies:
+        - S3ReadPolicy:
+            BucketName:
+              beautiful-test-images-ms
+        - S3WritePolicy:
+            BucketName:
+              beautiful-test-images-ms2
+  S3GetObjectHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: HelloWorldFunction
+      Handler: helloworld.S3ObjectRequestHandler::handleRequest
+      Policies:
+        - S3WritePolicy:
+            BucketName:
+              msailes-example-private-data
 
 Outputs:
   HelloWorldFunction:
